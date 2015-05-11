@@ -1,6 +1,21 @@
 require 'vcr/util/hooks'
 require 'uri'
 require 'cgi'
+require 'uri'
+
+if RUBY_VERSION >= "2.2"
+  require 'uri'
+
+  module URI
+    class << self
+      def parse_rfc2396(uri)
+        @rfc2396_parser ||= URI::RFC2396_Parser.new
+        @rfc2396_parser.parse(uri)
+      end
+      alias_method :parse, :parse_rfc2396
+    end
+  end
+end
 
 module VCR
   # Stores the VCR configuration.
