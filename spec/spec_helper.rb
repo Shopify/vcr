@@ -37,6 +37,7 @@ RSpec.configure do |config|
       VCR.reset!
       VCR.configuration.cassette_library_dir = tmp_dir
       VCR.configuration.uri_parser = LimitedURI
+      VCR.configuration.debug_logger = STDOUT if ENV['DEBUG']
     end
   end
 
@@ -44,13 +45,15 @@ RSpec.configure do |config|
     FileUtils.rm_rf tmp_dir
   end
 
-  config.before(:all, :disable_warnings => true) do
-    @orig_std_err = $stderr
-    $stderr = StringIO.new
-  end
+  unless ENV['DEBUG']
+    config.before(:all, :disable_warnings => true) do
+      @orig_std_err = $stderr
+      $stderr = StringIO.new
+    end
 
-  config.after(:all, :disable_warnings => true) do
-    $stderr = @orig_std_err
+    config.after(:all, :disable_warnings => true) do
+      $stderr = @orig_std_err
+    end
   end
 
   config.filter_run :focus => true
